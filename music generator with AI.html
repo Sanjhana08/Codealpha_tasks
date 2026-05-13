@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SONIC AI — Music Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#050816;
+    overflow:hidden;
+    height:100vh;
+    color:white;
+}
+
+/* Animated Background */
+
+.bg{
+    position:absolute;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    z-index:-1;
+}
+
+.circle{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(90px);
+    animation:float 10s infinite alternate;
+}
+
+.circle:nth-child(1){
+    width:350px;
+    height:350px;
+    background:#00f0ff;
+    left:-100px;
+    top:-50px;
+}
+
+.circle:nth-child(2){
+    width:400px;
+    height:400px;
+    background:#ff00d4;
+    right:-100px;
+    bottom:-80px;
+}
+
+.circle:nth-child(3){
+    width:250px;
+    height:250px;
+    background:#7bff00;
+    left:40%;
+    top:50%;
+}
+
+@keyframes float{
+    from{
+        transform:translateY(-20px) rotate(0deg);
+    }
+    to{
+        transform:translateY(20px) rotate(180deg);
+    }
+}
+
+/* Main Container */
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+    margin-top:40px;
+    padding:30px;
+    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:30px;
+    box-shadow:0 0 50px rgba(0,255,255,0.1);
+}
+
+/* Header */
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.logo{
+    font-family:'Orbitron',sans-serif;
+    font-size:35px;
+    font-weight:700;
+    color:#00f0ff;
+    text-shadow:0 0 20px #00f0ff;
+}
+
+.ai{
+    background:linear-gradient(45deg,#00f0ff,#ff00d4);
+    padding:10px 18px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:600;
+}
+
+/* Main Grid */
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
+
+/* Cards */
+
+.card{
+    background:rgba(255,255,255,0.05);
+    border-radius:25px;
+    padding:25px;
+    border:1px solid rgba(255,255,255,0.1);
+    transition:0.4s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 0 30px rgba(0,255,255,0.15);
+}
+
+/* Text Area */
+
+textarea{
+    width:100%;
+    height:180px;
+    border:none;
+    outline:none;
+    resize:none;
+    border-radius:20px;
+    padding:20px;
+    font-size:16px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    margin-top:15px;
+}
+
+textarea::placeholder{
+    color:rgba(255,255,255,0.5);
+}
+
+/* Select */
+
+.selects{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+    margin-top:20px;
+}
+
+select{
+    background:rgba(255,255,255,0.08);
+    border:none;
+    color:white;
+    padding:15px;
+    border-radius:15px;
+    outline:none;
+}
+
+option{
+    color:black;
+}
+
+/* Button */
+
+.generate-btn{
+    width:100%;
+    margin-top:25px;
+    padding:18px;
+    border:none;
+    border-radius:18px;
+    background:linear-gradient(45deg,#00f0ff,#ff00d4);
+    color:white;
+    font-size:17px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.4s;
+}
+
+.generate-btn:hover{
+    transform:scale(1.03);
+    box-shadow:0 0 30px #00f0ff;
+}
+
+/* Visualizer */
+
+.visualizer{
+    height:250px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:8px;
+    margin-top:40px;
+}
+
+.bar{
+    width:14px;
+    border-radius:20px;
+    background:linear-gradient(to top,#00f0ff,#ff00d4);
+    animation:music 1s infinite ease-in-out;
+}
+
+.bar:nth-child(1){height:60px; animation-delay:0.1s;}
+.bar:nth-child(2){height:120px; animation-delay:0.2s;}
+.bar:nth-child(3){height:80px; animation-delay:0.3s;}
+.bar:nth-child(4){height:150px; animation-delay:0.4s;}
+.bar:nth-child(5){height:100px; animation-delay:0.5s;}
+.bar:nth-child(6){height:170px; animation-delay:0.6s;}
+.bar:nth-child(7){height:90px; animation-delay:0.7s;}
+.bar:nth-child(8){height:130px; animation-delay:0.8s;}
+
+@keyframes music{
+    0%{
+        transform:scaleY(0.5);
+    }
+    50%{
+        transform:scaleY(1.4);
+    }
+    100%{
+        transform:scaleY(0.5);
+    }
+}
+
+/* Status */
+
+.status{
+    margin-top:20px;
+    text-align:center;
+    font-size:18px;
+    color:#00f0ff;
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+
+.grid{
+    grid-template-columns:1fr;
+}
+
+.logo{
+    font-size:25px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="bg">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+</div>
+
+<div class="container">
+
+<div class="header">
+    <div class="logo">SONIC AI</div>
+    <div class="ai">NEXT GEN MUSIC ENGINE</div>
+</div>
+
+<div class="grid">
+
+<!-- LEFT PANEL -->
+
+<div class="card">
+
+<h2>Create AI Music 🎵</h2>
+
+<textarea id="prompt"
+placeholder="Describe your music...
+
+Example:
+Cinematic emotional piano with deep bass and futuristic ambience"></textarea>
+
+<div class="selects">
+
+<select id="genre">
+<option>Lo-Fi</option>
+<option>EDM</option>
+<option>Classical</option>
+<option>Ambient</option>
+<option>Trap</option>
+<option>Cyberpunk</option>
+</select>
+
+<select id="mood">
+<option>Chill</option>
+<option>Energetic</option>
+<option>Dark</option>
+<option>Happy</option>
+<option>Emotional</option>
+</select>
+
+</div>
+
+<button class="generate-btn" onclick="generateMusic()">
+⚡ GENERATE AI MUSIC
+</button>
+
+<div class="status" id="status">
+Waiting for prompt...
+</div>
+
+</div>
+
+<!-- RIGHT PANEL -->
+
+<div class="card">
+
+<h2>Live Audio Visualizer 🎧</h2>
+
+<div class="visualizer">
+
+<div class="bar"></div>
+<div class="bar"></div>
+<div class="bar"></div>
+<div class="bar"></div>
+<div class="bar"></div>
+<div class="bar"></div>
+<div class="bar"></div>
+<div class="bar"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+
+async function generateMusic(){
+
+    await Tone.start();
+
+    let prompt = document.getElementById("prompt").value;
+
+    let genre = document.getElementById("genre").value;
+
+    let mood = document.getElementById("mood").value;
+
+    let status = document.getElementById("status");
+
+    status.innerHTML = "🤖 AI is generating music...";
+
+    let notes = [];
+
+    if(mood === "Chill"){
+        notes = ["C4","E4","G4","B4"];
+    }
+
+    else if(mood === "Energetic"){
+        notes = ["C5","D5","G5","A5"];
+    }
+
+    else if(mood === "Dark"){
+        notes = ["C3","D#3","G3","A#3"];
+    }
+
+    else if(mood === "Happy"){
+        notes = ["C4","E4","A4","C5"];
+    }
+
+    else{
+        notes = ["A3","C4","E4","G4"];
+    }
+
+    let index = 0;
+
+    const loop = new Tone.Loop(time => {
+
+        synth.triggerAttackRelease(notes[index % notes.length], "8n", time);
+
+        index++;
+
+    }, "4n").start(0);
+
+    Tone.Transport.start();
+
+    status.innerHTML = `
+    🎼 Music Generated Successfully
+    <br><br>
+    Genre: ${genre}
+    <br>
+    Mood: ${mood}
+    `;
+
+    setTimeout(()=>{
+        loop.stop();
+        Tone.Transport.stop();
+        status.innerHTML = "✅ Music session completed";
+    },15000);
+
+}
+
+</script>
+
+</body>
+</html>

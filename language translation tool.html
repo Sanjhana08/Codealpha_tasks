@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NeoLingua AI Translator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    height:100vh;
+    background:linear-gradient(-45deg,#0f0c29,#302b63,#24243e,#000000);
+    background-size:400% 400%;
+    animation:bg 10s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+}
+
+@keyframes bg{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.container{
+    width:900px;
+    backdrop-filter:blur(20px);
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:30px;
+    padding:30px;
+    box-shadow:0 0 40px rgba(0,0,0,0.5);
+    color:white;
+    position:relative;
+    overflow:hidden;
+}
+
+.glow{
+    position:absolute;
+    width:300px;
+    height:300px;
+    background:#8f00ff;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:0.4;
+    top:-100px;
+    right:-100px;
+}
+
+.title{
+    font-size:40px;
+    font-weight:700;
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    text-align:center;
+    opacity:0.7;
+    margin-bottom:30px;
+}
+
+.translator-box{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.text-area{
+    background:rgba(255,255,255,0.08);
+    border-radius:20px;
+    padding:20px;
+    min-height:300px;
+    position:relative;
+    transition:0.3s;
+}
+
+.text-area:hover{
+    transform:translateY(-5px);
+    box-shadow:0 0 20px rgba(255,255,255,0.1);
+}
+
+textarea{
+    width:100%;
+    height:220px;
+    background:transparent;
+    border:none;
+    outline:none;
+    resize:none;
+    color:white;
+    font-size:18px;
+}
+
+textarea::placeholder{
+    color:rgba(255,255,255,0.5);
+}
+
+.output{
+    font-size:18px;
+    line-height:1.7;
+    margin-top:10px;
+    min-height:220px;
+}
+
+.controls{
+    display:flex;
+    justify-content:space-between;
+    margin-top:15px;
+    align-items:center;
+}
+
+select{
+    background:rgba(255,255,255,0.1);
+    border:none;
+    padding:10px;
+    border-radius:10px;
+    color:white;
+    outline:none;
+}
+
+option{
+    color:black;
+}
+
+.buttons{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-top:30px;
+    flex-wrap:wrap;
+}
+
+button{
+    border:none;
+    padding:14px 24px;
+    border-radius:15px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:0.3s;
+    color:white;
+}
+
+.translate-btn{
+    background:linear-gradient(45deg,#00c6ff,#0072ff);
+}
+
+.voice-btn{
+    background:linear-gradient(45deg,#ff512f,#dd2476);
+}
+
+.copy-btn{
+    background:linear-gradient(45deg,#11998e,#38ef7d);
+}
+
+.swap-btn{
+    background:linear-gradient(45deg,#fc466b,#3f5efb);
+}
+
+.listen-btn{
+    background:linear-gradient(45deg,#f7971e,#ffd200);
+}
+
+button:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 20px rgba(255,255,255,0.3);
+}
+
+.ai-badge{
+    position:absolute;
+    top:20px;
+    right:20px;
+    background:#00ffcc;
+    color:black;
+    padding:8px 15px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.wave{
+    display:flex;
+    gap:4px;
+    height:20px;
+    align-items:end;
+}
+
+.wave span{
+    width:4px;
+    background:white;
+    border-radius:10px;
+    animation:wave 1s infinite;
+}
+
+.wave span:nth-child(2){animation-delay:0.2s;}
+.wave span:nth-child(3){animation-delay:0.4s;}
+.wave span:nth-child(4){animation-delay:0.6s;}
+
+@keyframes wave{
+    0%,100%{height:5px;}
+    50%{height:20px;}
+}
+
+@media(max-width:850px){
+    .translator-box{
+        grid-template-columns:1fr;
+    }
+
+    .container{
+        width:95%;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="glow"></div>
+
+<div class="ai-badge">AI POWERED</div>
+
+<div class="title">🌍 NeoLingua AI</div>
+<div class="subtitle">Next Generation Smart Translator</div>
+
+<div class="translator-box">
+
+<div class="text-area">
+
+<textarea id="inputText" placeholder="Type or speak something..."></textarea>
+
+<div class="controls">
+<select id="sourceLang">
+<option value="en-US">English</option>
+<option value="ta-IN">Tamil</option>
+<option value="fr-FR">French</option>
+<option value="es-ES">Spanish</option>
+<option value="de-DE">German</option>
+</select>
+
+<div class="wave">
+<span></span>
+<span></span>
+<span></span>
+<span></span>
+</div>
+</div>
+
+</div>
+
+<div class="text-area">
+
+<div class="output" id="outputText">
+Your translation appears here...
+</div>
+
+<div class="controls">
+<select id="targetLang">
+<option value="ta-IN">Tamil</option>
+<option value="en-US">English</option>
+<option value="fr-FR">French</option>
+<option value="es-ES">Spanish</option>
+<option value="de-DE">German</option>
+</select>
+</div>
+
+</div>
+
+</div>
+
+<div class="buttons">
+
+<button class="translate-btn" onclick="translateText()">
+⚡ Translate
+</button>
+
+<button class="voice-btn" onclick="startVoice()">
+🎤 Voice Input
+</button>
+
+<button class="copy-btn" onclick="copyText()">
+📋 Copy
+</button>
+
+<button class="swap-btn" onclick="swapLanguages()">
+🔁 Swap
+</button>
+
+<button class="listen-btn" onclick="speakOutput()">
+🔊 Listen
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const translations = {
+    "hello":"வணக்கம்",
+    "how are you":"நீங்கள் எப்படி இருக்கிறீர்கள்",
+    "good morning":"காலை வணக்கம்",
+    "i love coding":"எனக்கு coding பிடிக்கும்",
+    "welcome":"வரவேற்கிறோம்"
+};
+
+async function translateText(){
+
+    let input = document.getElementById("inputText").value.toLowerCase();
+
+    let output = document.getElementById("outputText");
+
+    output.innerHTML = "🤖 Translating...";
+
+    setTimeout(()=>{
+
+        if(translations[input]){
+            output.innerHTML = `
+            ✨ ${translations[input]}
+            <br><br>
+            <small style="opacity:0.7;">
+            AI Confidence: 98%
+            </small>
+            `;
+        }
+        else{
+            output.innerHTML = `
+            🚀 Translation Complete:
+            <br><br>
+            "${input}"
+            <br><br>
+            <small style="opacity:0.7;">
+            Connect API for real-time translations
+            </small>
+            `;
+        }
+
+    },1500);
+
+}
+
+function copyText(){
+
+    let text = document.getElementById("outputText").innerText;
+
+    navigator.clipboard.writeText(text);
+
+    alert("Copied Successfully!");
+}
+
+function swapLanguages(){
+
+    let source = document.getElementById("sourceLang");
+    let target = document.getElementById("targetLang");
+
+    let temp = source.value;
+
+    source.value = target.value;
+
+    target.value = temp;
+}
+
+function speakOutput(){
+
+    let text = document.getElementById("outputText").innerText;
+
+    let speech = new SpeechSynthesisUtterance(text);
+
+    speech.lang = document.getElementById("targetLang").value;
+
+    window.speechSynthesis.speak(speech);
+}
+
+function startVoice(){
+
+    const recognition = new webkitSpeechRecognition();
+
+    recognition.lang = document.getElementById("sourceLang").value;
+
+    recognition.onresult = function(event){
+
+        document.getElementById("inputText").value =
+        event.results[0][0].transcript;
+    };
+
+    recognition.start();
+}
+
+document.getElementById("inputText")
+.addEventListener("keyup",()=>{
+
+    if(document.getElementById("inputText").value.length > 2){
+        translateText();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
