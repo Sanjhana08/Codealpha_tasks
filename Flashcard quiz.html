@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Flashcard Quiz App</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      height:100vh;
+      background:linear-gradient(135deg,#141e30,#243b55);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      overflow:hidden;
+    }
+
+    .container{
+      width:420px;
+      background:rgba(255,255,255,0.1);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.2);
+      border-radius:25px;
+      padding:25px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.3);
+      color:white;
+      text-align:center;
+    }
+
+    h1{
+      font-size:28px;
+      margin-bottom:20px;
+      letter-spacing:1px;
+    }
+
+    .card{
+      height:240px;
+      perspective:1000px;
+      margin-bottom:20px;
+    }
+
+    .inner-card{
+      width:100%;
+      height:100%;
+      position:relative;
+      transition:transform 0.8s;
+      transform-style:preserve-3d;
+      cursor:pointer;
+    }
+
+    .flip{
+      transform:rotateY(180deg);
+    }
+
+    .front,
+    .back{
+      position:absolute;
+      width:100%;
+      height:100%;
+      border-radius:20px;
+      backface-visibility:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      font-size:22px;
+      font-weight:500;
+    }
+
+    .front{
+      background:linear-gradient(135deg,#ff9966,#ff5e62);
+    }
+
+    .back{
+      background:linear-gradient(135deg,#36d1dc,#5b86e5);
+      transform:rotateY(180deg);
+    }
+
+    .btn-group{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    button{
+      padding:10px 18px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:500;
+      transition:0.3s;
+    }
+
+    .primary{
+      background:#ffffff;
+      color:#333;
+    }
+
+    .primary:hover{
+      transform:scale(1.05);
+    }
+
+    .delete{
+      background:#ff4d4d;
+      color:white;
+    }
+
+    .delete:hover{
+      background:#e60000;
+    }
+
+    .inputs{
+      margin-top:20px;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      margin:8px 0;
+      border:none;
+      border-radius:12px;
+      outline:none;
+      font-size:14px;
+    }
+
+    .counter{
+      margin-top:12px;
+      font-size:14px;
+      opacity:0.8;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>📚 Smart Flashcards</h1>
+
+  <div class="card">
+    <div class="inner-card" id="flashcard">
+
+      <div class="front" id="question">
+        What is HTML?
+      </div>
+
+      <div class="back" id="answer">
+        HTML stands for HyperText Markup Language.
+      </div>
+
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="primary" onclick="prevCard()">⬅ Previous</button>
+    <button class="primary" onclick="flipCard()">🔄 Flip</button>
+    <button class="primary" onclick="nextCard()">Next ➡</button>
+  </div>
+
+  <div class="inputs">
+    <input type="text" id="newQuestion" placeholder="Enter Question">
+    <input type="text" id="newAnswer" placeholder="Enter Answer">
+
+    <div class="btn-group">
+      <button class="primary" onclick="addCard()">➕ Add Card</button>
+      <button class="delete" onclick="deleteCard()">🗑 Delete</button>
+    </div>
+  </div>
+
+  <div class="counter" id="counter">
+    Card 1 of 3
+  </div>
+
+</div>
+
+<script>
+
+  let flashcards = [
+    {
+      question:"What is HTML?",
+      answer:"HTML stands for HyperText Markup Language."
+    },
+    {
+      question:"What is CSS?",
+      answer:"CSS is used to style web pages."
+    },
+    {
+      question:"What is JavaScript?",
+      answer:"JavaScript adds interactivity to websites."
+    }
+  ];
+
+  let currentIndex = 0;
+
+  const flashcard = document.getElementById("flashcard");
+  const question = document.getElementById("question");
+  const answer = document.getElementById("answer");
+  const counter = document.getElementById("counter");
+
+  function loadCard(){
+
+    question.innerText = flashcards[currentIndex].question;
+    answer.innerText = flashcards[currentIndex].answer;
+
+    flashcard.classList.remove("flip");
+
+    counter.innerText =
+      `Card ${currentIndex + 1} of ${flashcards.length}`;
+  }
+
+  function flipCard(){
+    flashcard.classList.toggle("flip");
+  }
+
+  function nextCard(){
+
+    currentIndex++;
+
+    if(currentIndex >= flashcards.length){
+      currentIndex = 0;
+    }
+
+    loadCard();
+  }
+
+  function prevCard(){
+
+    currentIndex--;
+
+    if(currentIndex < 0){
+      currentIndex = flashcards.length - 1;
+    }
+
+    loadCard();
+  }
+
+  function addCard(){
+
+    let q = document.getElementById("newQuestion").value;
+    let a = document.getElementById("newAnswer").value;
+
+    if(q === "" || a === ""){
+      alert("Please fill all fields");
+      return;
+    }
+
+    flashcards.push({
+      question:q,
+      answer:a
+    });
+
+    document.getElementById("newQuestion").value = "";
+    document.getElementById("newAnswer").value = "";
+
+    currentIndex = flashcards.length - 1;
+
+    loadCard();
+
+    alert("Flashcard Added Successfully!");
+  }
+
+  function deleteCard(){
+
+    if(flashcards.length === 1){
+      alert("At least one card required!");
+      return;
+    }
+
+    flashcards.splice(currentIndex,1);
+
+    if(currentIndex >= flashcards.length){
+      currentIndex = flashcards.length - 1;
+    }
+
+    loadCard();
+  }
+
+  loadCard();
+
+</script>
+
+</body>
+</html>
